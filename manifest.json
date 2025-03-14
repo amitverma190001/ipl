@@ -1,0 +1,11 @@
+{
+  "name": "IPL Cricket 2025",
+  "short_name": "IPL Cricket",
+  "description": "Play cricket as your favorite Indian batsmen in this 3D cricket game",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#1a2a6c",
+  "theme_color": "#1a2a6c",
+  "orientation": "landscape",
+  "icons": []
+}
