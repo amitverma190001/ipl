@@ -1672,16 +1672,9 @@ async function endGame() {
         debug('Error in endGame: ' + error.message, true);
     }
     
-    // Create and add game over heading
-    const heading = document.createElement('h1');
-    heading.textContent = 'Game Over';
-    gameOver.appendChild(heading);
-    
-    // Update final score
-    const finalScore = document.createElement('div');
-    finalScore.id = 'final-score';
-    finalScore.textContent = `Total Runs: ${totalRuns}`;
-    gameOver.appendChild(finalScore);
+    // This section is now handled by the modern game over screen HTML
+    // and is no longer needed since we're using a template literal approach
+    // for the entire game over screen content
     
     // Add performance message
     let performanceMessage = '';
@@ -1695,10 +1688,7 @@ async function endGame() {
         performanceMessage = 'Nice try! Everyone has to start somewhere.';
     }
     
-    const perfMsg = document.createElement('div');
-    perfMsg.id = 'performance-message';
-    perfMsg.textContent = performanceMessage;
-    gameOver.appendChild(perfMsg);
+    // Performance message is now handled in the modern game over screen HTML
     
     try {
         // Show animated congratulations message
@@ -1769,42 +1759,17 @@ async function endGame() {
     `;
     document.head.appendChild(style);
     
-    // Set the voucher message content with hyperlink
-    voucherMessage.innerHTML = `
-        <div style="font-size:24px; margin-bottom:20px;">
-            Congratulations! You have won the MyCircle11 Voucher.
-        </div>
-        <a href="https://mycircle11.com/redeem" class="voucher-link" target="_blank">Click to Redeem</a>
-    `;
+    // The voucher message and play again button are now handled in the modern game over screen HTML
+    // with the template literal approach above
     
-    gameOver.appendChild(voucherMessage);
-    
-    // Add Play Again link instead of button
-    const playAgainContainer = document.createElement('div');
-    playAgainContainer.style.marginTop = '20px';
-    
-    const playAgainLink = document.createElement('a');
-    playAgainLink.href = "javascript:void(0)";
-    playAgainLink.className = 'play-again-link';
-    playAgainLink.textContent = 'Play Again';
-    playAgainLink.addEventListener('click', () => {
-        document.getElementById('game-over').style.display = 'none';
-        document.getElementById('player-selection').style.display = 'flex';
+    // Make the game over screen visible
+    const gameOver = document.getElementById('game-over');
+    if (gameOver) {
+        gameOver.style.display = 'flex';
         
-        // Reset game state
-        ballsLeft = 6;
-        totalRuns = 0;
-        isGameOver = false;
-        
-        // Reset UI
-        updateScoreUI();
-    });
-    
-    playAgainContainer.appendChild(playAgainLink);
-    gameOver.appendChild(playAgainContainer);
-    
-    // Force a reflow to ensure the display change takes effect
-    void gameOver.offsetWidth;
+        // Force a reflow to ensure the display change takes effect
+        void gameOver.offsetWidth;
+    }
     debug("Game over screen is now visible with all content");
 }
 
