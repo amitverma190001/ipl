@@ -831,8 +831,18 @@ let soundEffects = {
 // Audio elements cache
 const audioCache = {};
 
+// Flag to track if sound is enabled
+window.audioEnabled = false;
+
 // Play audio with fallbacks and better mobile support
 function playAudioFile(src) {
+    if (!window.audioEnabled) {
+        debug('Sound is disabled. Enable sound first.');
+        // Show the sound enable button if not already visible
+        showSoundEnableButton();
+        return;
+    }
+    
     try {
         // Create or get cached audio element
         if (!audioCache[src]) {
@@ -855,9 +865,8 @@ function playAudioFile(src) {
             playPromise.catch(error => {
                 console.log('Audio play error:', error);
                 // Auto-play was prevented, we'll need user interaction
-                if (!window.audioEnabled) {
-                    setupAudioEnabling();
-                }
+                window.audioEnabled = false;
+                showSoundEnableButton();
             });
         }
     } catch (e) {
@@ -865,30 +874,55 @@ function playAudioFile(src) {
     }
 }
 
+// Show sound enable button if needed
+function showSoundEnableButton() {
+    const enableSoundBtn = document.getElementById('enable-sound');
+    if (enableSoundBtn) {
+        enableSoundBtn.style.display = 'flex';
+    }
+}
+
 // Set up audio enabling for mobile
-function setupAudioEnabling() {
-    if (window.audioEnabled) return;
-    
-    const enableAudio = () => {
-        // Try to play all cached audio files silently
-        Object.values(audioCache).forEach(audio => {
-            audio.volume = 0;
-            audio.play().catch(() => {});
+function enableAudio() {
+    // Try to play all cached audio files silently
+    const enablePromises = Object.values(audioCache).map(audio => {
+        audio.volume = 0;
+        const promise = audio.play().catch(e => {
+            console.log('Could not play audio silently:', e);
+            return false;
+        });
+        return promise.then(() => {
             audio.pause();
             audio.volume = 1;
+            return true;
         });
-        window.audioEnabled = true;
-        
-        // Remove listeners once audio is enabled
-        document.removeEventListener('touchstart', enableAudio, true);
-        document.removeEventListener('touchend', enableAudio, true);
-        document.removeEventListener('click', enableAudio, true);
-    };
+    });
     
-    // Add listeners for user interaction
-    document.addEventListener('touchstart', enableAudio, true);
-    document.addEventListener('touchend', enableAudio, true);
-    document.addEventListener('click', enableAudio, true);
+    // Update UI when audio is enabled
+    Promise.all(enablePromises).then(results => {
+        const allSuccess = results.every(result => result === true);
+        window.audioEnabled = allSuccess;
+        
+        const enableSoundBtn = document.getElementById('enable-sound');
+        if (enableSoundBtn) {
+            if (window.audioEnabled) {
+                enableSoundBtn.textContent = 'Sound Enabled ✓';
+                enableSoundBtn.style.background = '#2ecc71';
+            } else {
+                enableSoundBtn.textContent = 'Try Again';
+                setTimeout(() => {
+                    enableSoundBtn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+                            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                        </svg>
+                        Enable Sound
+                    `;
+                }, 2000);
+            }
+        }
+    });
 }
 
 // Initialize sound effects
@@ -902,8 +936,13 @@ function loadSoundEffects() {
         audioCache[src] = audio;
     });
     
-    // Set up audio enabling for mobile
-    setupAudioEnabling();
+    // Set up sound enable button
+    const enableSoundBtn = document.getElementById('enable-sound');
+    if (enableSoundBtn) {
+        enableSoundBtn.addEventListener('click', function() {
+            enableAudio();
+        });
+    }
 }
 
 function setupEventHandlers() {
