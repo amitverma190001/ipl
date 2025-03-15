@@ -796,122 +796,114 @@ function createWickets(zPosition) {
     scene.add(wicketGroup);
 }
 
-let audioContext;
-let audioBuffers = {};
-
-// Initialize sound effects with empty functions
-const createEmptySoundEffects = () => ({
-    bat: { play: () => debug('Bat sound played') },
-    crowd: { play: () => debug('Crowd sound played') },
-    four: { play: () => debug('Four sound played') },
-    six: { play: () => debug('Six sound played') },
-    out: { play: () => debug('Out sound played') }
-});
-
-// Global sound effects object
-let soundEffects = createEmptySoundEffects();
-
-async function initAudioContext() {
-    if (!audioContext) {
-        try {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        } catch (e) {
-            console.error('Web Audio API not supported:', e);
-            return false;
+// Simple sound effects implementation that works across all devices
+let soundEffects = {
+    bat: {
+        play: function() {
+            debug('Bat sound played');
+        }
+    },
+    crowd: {
+        play: function() {
+            debug('Crowd sound played');
+        }
+    },
+    four: {
+        play: function() {
+            debug('Four sound played');
+            playAudioFile('./assets/Four.mp3');
+        }
+    },
+    six: {
+        play: function() {
+            debug('Six sound played');
+            playAudioFile('./assets/Six.mp3');
+        }
+    },
+    out: {
+        play: function() {
+            debug('Out sound played');
+            playAudioFile('./assets/Out.mp3');
         }
     }
-    return true;
-}
+};
 
-async function loadAudioBuffer(url) {
-    try {
-        const response = await fetch(url);
-        const arrayBuffer = await response.arrayBuffer();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        return audioBuffer;
-    } catch (e) {
-        console.error('Error loading audio buffer:', e);
-        return null;
-    }
-}
+// Audio elements cache
+const audioCache = {};
 
-async function playSound(buffer) {
-    if (!buffer || !audioContext) return;
-    
+// Play audio with fallbacks and better mobile support
+function playAudioFile(src) {
     try {
-        // Resume context if suspended
-        if (audioContext.state === 'suspended') {
-            await audioContext.resume();
+        // Create or get cached audio element
+        if (!audioCache[src]) {
+            const audio = new Audio(src);
+            audio.setAttribute('playsinline', '');
+            audio.setAttribute('webkit-playsinline', '');
+            audio.preload = 'auto';
+            audioCache[src] = audio;
         }
         
-        const source = audioContext.createBufferSource();
-        source.buffer = buffer;
-        source.connect(audioContext.destination);
-        source.start(0);
+        const audioElement = audioCache[src];
+        
+        // Reset audio to beginning if it's already playing
+        audioElement.currentTime = 0;
+        
+        // Play with promise handling for modern browsers
+        const playPromise = audioElement.play();
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(error => {
+                console.log('Audio play error:', error);
+                // Auto-play was prevented, we'll need user interaction
+                if (!window.audioEnabled) {
+                    setupAudioEnabling();
+                }
+            });
+        }
     } catch (e) {
-        console.error('Error playing sound:', e);
+        console.error('Error playing audio:', e);
     }
 }
 
-async function loadSoundEffects() {
-    // Wait for user interaction before initializing audio
-    const setupAudio = async () => {
-        // Initialize Web Audio API context
-        const initialized = await initAudioContext();
-        if (!initialized) return;
-
-        // Load sound buffers
-        const soundFiles = {
-            four: './assets/Four.mp3',
-            six: './assets/Six.mp3',
-            out: './assets/Out.mp3'
-        };
-
-        // Load all sound buffers
-        for (const [key, url] of Object.entries(soundFiles)) {
-            audioBuffers[key] = await loadAudioBuffer(url);
-        }
-
-        // Update sound effects with actual implementations
-        soundEffects = {
-            bat: { 
-                play: () => debug('Bat sound played')
-            },
-            crowd: { 
-                play: () => debug('Crowd sound played')
-            },
-            four: { 
-                play: async () => {
-                    debug('Four sound played');
-                    await playSound(audioBuffers.four);
-                }
-            },
-            six: { 
-                play: async () => {
-                    debug('Six sound played');
-                    await playSound(audioBuffers.six);
-                }
-            },
-            out: {
-                play: async () => {
-                    debug('Out sound played');
-                    await playSound(audioBuffers.out);
-                }
-            }
-        };
+// Set up audio enabling for mobile
+function setupAudioEnabling() {
+    if (window.audioEnabled) return;
+    
+    const enableAudio = () => {
+        // Try to play all cached audio files silently
+        Object.values(audioCache).forEach(audio => {
+            audio.volume = 0;
+            audio.play().catch(() => {});
+            audio.pause();
+            audio.volume = 1;
+        });
+        window.audioEnabled = true;
+        
+        // Remove listeners once audio is enabled
+        document.removeEventListener('touchstart', enableAudio, true);
+        document.removeEventListener('touchend', enableAudio, true);
+        document.removeEventListener('click', enableAudio, true);
     };
+    
+    // Add listeners for user interaction
+    document.addEventListener('touchstart', enableAudio, true);
+    document.addEventListener('touchend', enableAudio, true);
+    document.addEventListener('click', enableAudio, true);
+}
 
-    // Setup audio on first user interaction
-    const handleInteraction = async () => {
-        await setupAudio();
-        // Remove listeners after setup
-        document.removeEventListener('touchstart', handleInteraction);
-        document.removeEventListener('click', handleInteraction);
-    };
-
-    // Listen for both touch and click events
-    document.addEventListener('touchstart', handleInteraction);
-    document.addEventListener('click', handleInteraction);
+// Initialize sound effects
+function loadSoundEffects() {
+    // Pre-cache audio files
+    ['./assets/Four.mp3', './assets/Six.mp3', './assets/Out.mp3'].forEach(src => {
+        const audio = new Audio(src);
+        audio.setAttribute('playsinline', '');
+        audio.setAttribute('webkit-playsinline', '');
+        audio.preload = 'auto';
+        audioCache[src] = audio;
+    });
+    
+    // Set up audio enabling for mobile
+    setupAudioEnabling();
 }
 
 function setupEventHandlers() {
