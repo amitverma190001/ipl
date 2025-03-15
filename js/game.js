@@ -141,11 +141,12 @@ function init() {
         // Generate dynamic icons for PWA if needed
         generateIcons();
         
-        // Setup player selection
+        // Setup player selection and show it immediately
         setupPlayerSelection();
+        document.getElementById('player-selection').style.display = 'flex';
         
-        // Ensure loading screen is visible
-        document.getElementById('loading-screen').style.display = 'flex';
+        // Skip loading screen as per user request
+        document.getElementById('loading-screen').style.display = 'none';
         
         // Set up the 3D scene
         debug("Setting up 3D scene");
@@ -154,10 +155,9 @@ function init() {
         // Load game assets
         debug("Loading game assets");
         loadAssets().then(() => {
-            debug("Assets loaded, showing player selection");
+            debug("Assets loaded, player selection already visible");
             
-            // Hide loading screen
-            document.getElementById('loading-screen').style.display = 'none';
+            // Ensure player selection is visible
             document.getElementById('player-selection').style.display = 'flex';
             
             // Start animation loop
@@ -753,7 +753,7 @@ function createPlaceholderModels() {
     context.textAlign = 'center';
     context.textBaseline = 'middle';
     context.fillStyle = '#FFFFFF';
-    context.fillText('Stuti Premier League 2025', canvas.width / 2, canvas.height / 2);
+    context.fillText('Hindustan Times IPL 2025', canvas.width / 2, canvas.height / 2);
     
     // Create a texture from the canvas
     const texture = new THREE.CanvasTexture(canvas);
@@ -798,7 +798,7 @@ function createWickets(zPosition) {
 }
 
 function loadSoundEffects() {
-    // In a full implementation, we would load actual sound files here
+    // Load actual sound files from assets folder
     soundEffects = {
         bat: { 
             play: function() { 
@@ -817,28 +817,36 @@ function loadSoundEffects() {
                 debug('Crowd sound played');
             }
         },
-        boundary: { 
+        four: { 
             play: function() { 
-                debug('Boundary sound played');
+                debug('Four sound played');
                 try {
-                    // Play a higher pitch for boundary
-                    const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAsAABIiAALCxMTGxsjIysrMzM7O0NDSkpSUlpaYmJqanJyenqCgoqKkpKampqio6Orq7Ozu7vDw8vLzc3V1d3d5eXt7e/v9/f///8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAASIhYQOWfAAAAAAD/+9RkAA/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARMQU1FMy45OS41VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=');
+                    const audio = new Audio('./assets/Four.mp3');
                     audio.play();
                 } catch (e) {
-                    console.log('Browser blocked audio autoplay');
+                    console.log('Browser blocked audio autoplay:', e);
                 }
             }
         },
-        // CHANGE 2: Add miss sound for when player gets out
-        miss: {
-            play: function() {
-                debug('Miss sound played - player out');
+        six: { 
+            play: function() { 
+                debug('Six sound played');
                 try {
-                    // Play a lower pitch for miss/out
-                    const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAsAABIiAALCxMTGxsjIysrMzM7O0NDSkpSUlpaYmJqanJyenqCgoqKkpKampqio6Orq7Ozu7vDw8vLzc3V1d3d5eXt7e/v9/f///8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAASIhYQOWfAAAAAAD/+9RkAA/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARMQU1FMy45OS41VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=');
+                    const audio = new Audio('./assets/Six.mp3');
                     audio.play();
                 } catch (e) {
-                    console.log('Browser blocked audio autoplay');
+                    console.log('Browser blocked audio autoplay:', e);
+                }
+            }
+        },
+        out: {
+            play: function() {
+                debug('Out sound played');
+                try {
+                    const audio = new Audio('./assets/Out.mp3');
+                    audio.play();
+                } catch (e) {
+                    console.log('Browser blocked audio autoplay:', e);
                 }
             }
         }
@@ -964,6 +972,11 @@ function startGame() {
     console.log("Starting game with player:", selectedPlayer);
     
     try {
+        // Reset game state
+        ballsLeft = 6;
+        totalRuns = 0;
+        isGameOver = false;
+        
         // Hide player selection screen
         document.getElementById('player-selection').style.display = 'none';
         // Show game screen - make sure it's visible
@@ -971,9 +984,10 @@ function startGame() {
         gameContainer.style.display = 'flex';
         gameContainer.classList.remove('hidden');
         
-        // Update UI with selected player
+        // Update UI with selected player and initial game state
         document.getElementById('current-batsman').textContent = 
             `Batsman: ${playerStats[selectedPlayer].name}`;
+        updateScoreUI(); // Show initial ball count
         
         // Make sure the canvas is visible
         const canvas = document.getElementById('game-canvas');
@@ -1094,7 +1108,9 @@ function hitBall(directionX, directionY, swipeStrength) {
     
     if (!isHit) {
         // Missed the ball - player is out
-        soundEffects.miss.play();
+        if (soundEffects && soundEffects.out) {
+            soundEffects.out.play();
+        }
         ballIsMoving = false;
         showShotResult(0, true); // Show OUT!
         
@@ -1207,18 +1223,22 @@ function moveBatWithSwipe(directionX, directionY) {
     const originalRotationX = -Math.PI / 6; // Slight forward tilt
     const originalRotationY = 0.3; // Slight angle to the right
     
-    // Calculate new rotation based on swipe direction - realistic cricket swing
-    const newRotationZ = originalRotationZ - directionY * 0.4; // More vertical angle adjustment
-    const newRotationY = originalRotationY - directionX * 0.8; // Controlled horizontal swing
-    const newRotationX = originalRotationX - Math.abs(directionX) * 0.3; // Forward rotation during swing
+    // Enhanced rotation based on swipe direction for more dramatic swing
+    const swingIntensity = Math.sqrt(directionX * directionX + directionY * directionY);
+    const powerFactor = Math.min(swingIntensity * 1.5, 2.0); // Amplify the swing but cap it
     
-    // Animate the bat swing
-    const swingDuration = 10; // frames - faster, crisper swing
+    // Calculate new rotations with enhanced movement
+    const newRotationZ = originalRotationZ - directionY * 0.8 * powerFactor; // More vertical movement
+    const newRotationY = originalRotationY - directionX * 1.2 * powerFactor; // Enhanced horizontal swing
+    const newRotationX = originalRotationX - Math.abs(directionX) * 0.6 * powerFactor; // More forward rotation
+    
+    // Animate the bat swing with more dramatic movement
+    const swingDuration = 15; // Slightly longer for more visible movement
     let frame = 0;
     
     const animateBatSwing = () => {
         if (frame >= swingDuration) {
-            // Reset to original position after swing
+            // Smooth reset to original position
             batGroup.position.set(originalPosition.x, originalPosition.y, originalPosition.z);
             batGroup.rotation.z = originalRotationZ;
             batGroup.rotation.x = originalRotationX;
@@ -1227,22 +1247,31 @@ function moveBatWithSwipe(directionX, directionY) {
         }
         
         const progress = frame / swingDuration;
-        // Use easing for more realistic swing
-        const easeProgress = progress < 0.4 ? 
-            2.5 * progress * progress : // Quicker backswing
-            1 - Math.pow(-2 * progress + 2, 2) / 2; // Powerful forward swing
+        // Enhanced easing for more dramatic swing
+        const easeProgress = progress < 0.35 ? 
+            3 * progress * progress : // More aggressive backswing
+            1 - Math.pow(-2 * progress + 2, 1.8) / 2; // More powerful forward swing
         
-        // Apply the swing movement
-        if (progress < 0.4) {
-            // Backswing - prepare
-            batGroup.position.z = originalPosition.z + 0.3 * easeProgress; // Pull back
-            batGroup.rotation.y = originalRotationY + 0.4 * easeProgress; // Wind up
+        // Apply enhanced swing movement
+        if (progress < 0.35) {
+            // Dramatic backswing
+            batGroup.position.z = originalPosition.z + 0.6 * easeProgress * powerFactor; // More pullback
+            batGroup.position.y = originalPosition.y + 0.3 * easeProgress * powerFactor; // Slight upward movement
+            batGroup.rotation.y = originalRotationY + 0.8 * easeProgress * powerFactor; // More wind up
+            batGroup.rotation.x = originalRotationX - 0.3 * easeProgress * powerFactor; // Tilt back
         } else {
-            // Forward swing - hit the ball
-            batGroup.position.z = originalPosition.z + 0.3 - 0.6 * easeProgress; // Move forward
-            batGroup.rotation.y = originalRotationY + 0.4 - (0.4 + Math.abs(newRotationY - originalRotationY)) * easeProgress;
-            batGroup.rotation.x = originalRotationX + (newRotationX - originalRotationX) * easeProgress;
-            batGroup.rotation.z = originalRotationZ + (newRotationZ - originalRotationZ) * easeProgress;
+            // Powerful forward swing with follow-through
+            const swingProgress = (progress - 0.35) / 0.65; // Normalized progress for forward swing
+            const followThrough = Math.sin(swingProgress * Math.PI); // Smooth follow-through motion
+            
+            // Enhanced forward movement
+            batGroup.position.z = originalPosition.z + 0.6 - (1.2 * powerFactor * followThrough); // More forward reach
+            batGroup.position.y = originalPosition.y + 0.3 - (0.4 * powerFactor * followThrough); // Vertical movement
+            
+            // Dynamic rotation during swing
+            batGroup.rotation.y = originalRotationY + 0.8 - (1.2 + Math.abs(newRotationY - originalRotationY)) * followThrough;
+            batGroup.rotation.x = originalRotationX + (newRotationX - originalRotationX) * followThrough;
+            batGroup.rotation.z = originalRotationZ + (newRotationZ - originalRotationZ) * followThrough;
         }
         
         frame++;
@@ -1280,8 +1309,8 @@ function getPerformanceMessage(runs, strikeRate) {
 }
 
 // Function to share score on social media
-function shareScore(runs, strikeRate, boundaries) {
-    const text = `🏏 Just scored ${runs} runs with a strike rate of ${strikeRate.toFixed(1)} in IPL Cricket 2025! ${boundaries} boundaries! Can you beat my score? 🎮`;
+function shareScore(runs) {
+    const text = `🏏 Just scored ${runs} runs in IPL Cricket 2025! Can you beat my score? 🎮`;
     
     if (navigator.share) {
         navigator.share({
@@ -1316,17 +1345,21 @@ function calculateRuns(distance) {
     else if (distance >= 40) {
         if (ball.position.y > 0.5) {
             runs = 6; // Six
-            soundEffects.boundary.play();
+            if (soundEffects && soundEffects.six) {
+                soundEffects.six.play();
+            }
         } else {
             runs = 4; // Four
-            soundEffects.boundary.play();
+            if (soundEffects && soundEffects.four) {
+                soundEffects.four.play();
+            }
         }
     } 
     // Regular runs
     else {
         // Convert distance to runs (roughly distance / 10)
         runs = Math.floor(distance / 10);
-        if (runs > 0) {
+        if (runs > 0 && soundEffects && soundEffects.crowd) {
             soundEffects.crowd.play();
         }
     }
@@ -1334,12 +1367,14 @@ function calculateRuns(distance) {
     // Update total
     totalRuns += runs;
     
-    // Update UI
+    // Update UI with current ball result
     showShotResult(runs, isOut);
-    updateScoreUI();
     
     // Check if game should continue
     ballsLeft--;
+    
+    // Update UI with new ball count
+    updateScoreUI();
     
     if (ballsLeft > 0 && !isOut) {
         // Prepare next ball after a delay
@@ -1350,7 +1385,7 @@ function calculateRuns(distance) {
     }
 }
 
-// CHANGE 3: Show good graphics of 6, 4 and Out
+// CHANGE 3: Show good graphics of 6, 4 and Out with sound effects
 function showShotResult(runs, isOut) {
     const lastShotContainer = document.getElementById('last-shot-container');
     const lastShotRuns = document.getElementById('last-shot-runs');
@@ -1359,14 +1394,26 @@ function showShotResult(runs, isOut) {
         lastShotRuns.textContent = 'OUT!';
         lastShotRuns.style.color = '#e74c3c'; // Red
         showAnimatedText("OUT!", "out-animation");
+        // Play out sound effect
+        if (soundEffects && soundEffects.out) {
+            soundEffects.out.play();
+        }
     } else if (runs === 6) {
         lastShotRuns.textContent = 'SIX!';
         lastShotRuns.style.color = '#f1c40f'; // Gold
         showAnimatedText("SIX!", "six-animation");
+        // Play six sound effect
+        if (soundEffects && soundEffects.six) {
+            soundEffects.six.play();
+        }
     } else if (runs === 4) {
         lastShotRuns.textContent = 'FOUR!';
         lastShotRuns.style.color = '#3498db'; // Blue
         showAnimatedText("FOUR!", "four-animation");
+        // Play four sound effect
+        if (soundEffects && soundEffects.four) {
+            soundEffects.four.play();
+        }
     } else {
         lastShotRuns.textContent = runs > 0 ? `${runs} RUNS` : 'NO RUN';
         lastShotRuns.style.color = 'white';
@@ -1438,7 +1485,7 @@ function showAnimatedText(text, className, targetElement = 'game-container') {
         redeemButton.innerHTML = `
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 6L9 17l-5-5"/>
-            </svg>
+            </svg>R
             Click to Redeem
         `;
         redeemButton.style.fontStyle = 'italic';
@@ -1548,27 +1595,25 @@ async function endGame() {
             if (shot.textContent === 'SIX!') sixes++;
         });
         
-        // Create modern game over screen HTML
+        // Create modern game over screen HTML with combined summary and voucher
         gameOver.innerHTML = `
             <div class="game-over-container">
-                <h1 class="game-over-title">Game Over</h1>
-                <div class="score-card">
-                    <div class="score-header">Match Summary</div>
-                    <div id="final-score" class="final-score">Total Runs: ${totalRuns}</div>
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-label">Strike Rate</span>
-                            <span class="stat-value">${strikeRate.toFixed(1)}</span>
+                <h1 class="game-over-title" style="font-size: 28px; margin: 10px 0;">Congratulations!</h1>
+                <div class="score-card" style="background: rgba(44, 62, 80, 0.9); padding: 20px; border-radius: 10px; margin: 20px; border: 3px solid #f1c40f;">
+                    <div class="score-header" style="font-size: 24px; margin-bottom: 15px;">Match Summary</div>
+                    <div id="final-score" class="final-score" style="font-size: 32px; margin-bottom: 20px;">Total Runs: ${totalRuns}</div>
+                    <div class="voucher-message" style="font-size: 22px; margin: 20px 0;">
+                        You have won the MyCircle11 Voucher!
+                        <div style="margin-top: 15px;">
+                            <a href="https://mycircle11.com/redeem" class="voucher-link" target="_blank" 
+                               style="display: inline-block; padding: 10px 20px; background: #f1c40f; color: #2c3e50; 
+                                      border-radius: 5px; text-decoration: none; font-weight: bold;">Click to Redeem</a>
                         </div>
                     </div>
                 </div>
                 
-                <div id="performance-message" class="performance-message">
-                    ${getPerformanceMessage(totalRuns, strikeRate)}
-                </div>
-                
-                <div class="action-buttons">
-                    <button id="share-score" class="btn-secondary">
+                <div class="action-buttons" style="display: flex; flex-direction: column; gap: 15px; align-items: center;">
+                    <button id="share-score" class="btn-secondary" style="background: #3498db; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 200px;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
                             <polyline points="16 6 12 2 8 6"/>
@@ -1576,7 +1621,7 @@ async function endGame() {
                         </svg>
                         Share Score
                     </button>
-                    <button id="play-again" class="btn-primary">
+                    <button id="play-again" class="btn-primary" style="background: #2ecc71; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; width: 200px; display: flex; align-items: center; justify-content: center; gap: 8px;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
                             <path d="M3 3v5h5"/>
@@ -1593,61 +1638,14 @@ async function endGame() {
         
         // Add event listeners for buttons
         document.getElementById('share-score').addEventListener('click', () => {
-            shareScore(totalRuns, strikeRate, boundaries);
+            shareScore(totalRuns);
         });
         
         document.getElementById('play-again').addEventListener('click', () => {
-            window.location.reload();
-        });
-        
-        try {
-            // Show animated congratulations message
-            await showAnimatedText("CONGRATULATIONS!", "voucher-animation", "game-over");
-        } catch (error) {
-            debug('Animation error: ' + error.message, true);
-        }
-        
-        // Create voucher message with hyperlink
-        const voucherMessage = document.createElement('div');
-        voucherMessage.id = 'voucher-message';
-        Object.assign(voucherMessage.style, {
-            marginTop: '30px',
-            marginBottom: '30px',
-            padding: '20px',
-            backgroundColor: '#2c3e50',
-            borderRadius: '10px',
-            border: '3px solid #f1c40f',
-            color: '#ffffff',
-            fontSize: '22px',
-            fontWeight: 'bold',
-            textShadow: '2px 2px 4px rgba(0,0,0,0.8)',
-            width: '90%',
-            maxWidth: '500px',
-            boxShadow: '0 5px 20px rgba(0,0,0,0.7)',
-            animation: 'pulse 2s infinite',
-            textAlign: 'center'
-        });
-        
-        voucherMessage.innerHTML = `
-            <div style="font-size:24px; margin-bottom:20px;">
-                Congratulations! You have won the MyCircle11 Voucher.
-            </div>
-            <a href="https://mycircle11.com/redeem" class="voucher-link" target="_blank">Click to Redeem</a>
-        `;
-        
-        gameOver.appendChild(voucherMessage);
-        
-        // Add Play Again link
-        const playAgainContainer = document.createElement('div');
-        playAgainContainer.style.marginTop = '20px';
-        
-        const playAgainLink = document.createElement('a');
-        playAgainLink.href = "javascript:void(0)";
-        playAgainLink.className = 'play-again-link';
-        playAgainLink.textContent = 'Play Again';
-        playAgainLink.addEventListener('click', () => {
+            // Hide game over screen
             gameOver.style.display = 'none';
-            playerSelection.style.display = 'flex';
+            // Show player selection screen
+            document.getElementById('player-selection').style.display = 'flex';
             
             // Reset game state
             ballsLeft = 6;
@@ -1658,8 +1656,16 @@ async function endGame() {
             updateScoreUI();
         });
         
-        playAgainContainer.appendChild(playAgainLink);
-        gameOver.appendChild(playAgainContainer);
+        try {
+            // Show animated congratulations message
+            await showAnimatedText("CONGRATULATIONS!", "voucher-animation", "game-over");
+        } catch (error) {
+            debug('Animation error: ' + error.message, true);
+        }
+        
+        // Voucher message is now integrated into the main game over screen
+        
+        // Play Again functionality is now handled through the Play Again button in the action buttons
         
         // Final check to ensure visibility
         requestAnimationFrame(() => {
@@ -1689,13 +1695,7 @@ async function endGame() {
     }
     
     // Performance message is now handled in the modern game over screen HTML
-    
-    try {
-        // Show animated congratulations message
-        await showAnimatedText("CONGRATULATIONS!", "voucher-animation", "game-over");
-    } catch (error) {
-        debug('Animation error: ' + error.message, true);
-    }
+
     
     // Create voucher message with hyperlink as requested
     const voucherMessage = document.createElement('div');
