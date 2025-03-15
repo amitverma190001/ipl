@@ -1597,7 +1597,7 @@ function showAnimatedText(text, className, targetElement = 'game-container') {
 
 function updateScoreUI() {
     document.getElementById('total-runs').textContent = `Runs: ${totalRuns}`;
-    document.getElementById('balls-left').textContent = `Balls: ${ballsLeft}`;
+    document.getElementById('balls-left').textContent = `Balls Left: ${ballsLeft}`;
 }
 
 async function endGame() {
