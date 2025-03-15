@@ -798,18 +798,25 @@ function createWickets(zPosition) {
 }
 
 function loadSoundEffects() {
-    // Load actual sound files from assets folder
+    // Pre-load audio elements for better mobile support
+    const audioElements = {
+        four: new Audio('./assets/Four.mp3'),
+        six: new Audio('./assets/Six.mp3'),
+        out: new Audio('./assets/Out.mp3')
+    };
+
+    // Set attributes for mobile playback
+    Object.values(audioElements).forEach(audio => {
+        audio.setAttribute('playsinline', '');
+        audio.setAttribute('webkit-playsinline', '');
+        audio.preload = 'auto';
+    });
+
+    // Initialize sound effects with proper mobile handling
     soundEffects = {
         bat: { 
             play: function() { 
                 debug('Bat sound played');
-                try {
-                    // Try to play a sound if browser allows
-                    const audio = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAAsAABIiAALCxMTGxsjIysrMzM7O0NDSkpSUlpaYmJqanJyenqCgoqKkpKampqio6Orq7Ozu7vDw8vLzc3V1d3d5eXt7e/v9/f///8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAASIhYQOWfAAAAAAD/+9RkAA/wAABpAAAACAAADSAAAAEAAAGkAAAAIAAANIAAAARMQU1FMy45OS41VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVU=');
-                    audio.play();
-                } catch (e) {
-                    console.log('Browser blocked audio autoplay');
-                }
             }
         },
         crowd: { 
@@ -818,39 +825,68 @@ function loadSoundEffects() {
             }
         },
         four: { 
-            play: function() { 
+            play: async function() { 
                 debug('Four sound played');
                 try {
-                    const audio = new Audio('./assets/Four.mp3');
-                    audio.play();
+                    await audioElements.four.play();
                 } catch (e) {
-                    console.log('Browser blocked audio autoplay:', e);
+                    debug('Error playing four sound: ' + e.message);
+                    // Try to recover by resetting and playing again
+                    audioElements.four.currentTime = 0;
+                    try {
+                        await audioElements.four.play();
+                    } catch (e2) {
+                        debug('Failed to play sound after retry');
+                    }
                 }
             }
         },
         six: { 
-            play: function() { 
+            play: async function() { 
                 debug('Six sound played');
                 try {
-                    const audio = new Audio('./assets/Six.mp3');
-                    audio.play();
+                    await audioElements.six.play();
                 } catch (e) {
-                    console.log('Browser blocked audio autoplay:', e);
+                    debug('Error playing six sound: ' + e.message);
+                    // Try to recover by resetting and playing again
+                    audioElements.six.currentTime = 0;
+                    try {
+                        await audioElements.six.play();
+                    } catch (e2) {
+                        debug('Failed to play sound after retry');
+                    }
                 }
             }
         },
         out: {
-            play: function() {
+            play: async function() {
                 debug('Out sound played');
                 try {
-                    const audio = new Audio('./assets/Out.mp3');
-                    audio.play();
+                    await audioElements.out.play();
                 } catch (e) {
-                    console.log('Browser blocked audio autoplay:', e);
+                    debug('Error playing out sound: ' + e.message);
+                    // Try to recover by resetting and playing again
+                    audioElements.out.currentTime = 0;
+                    try {
+                        await audioElements.out.play();
+                    } catch (e2) {
+                        debug('Failed to play sound after retry');
+                    }
                 }
             }
         }
     };
+
+    // Add touch event listener to enable audio on first interaction
+    document.addEventListener('touchstart', function() {
+        // Try to play all sounds with volume 0 to enable them
+        Object.values(audioElements).forEach(audio => {
+            audio.volume = 0;
+            audio.play().catch(() => {});
+            audio.pause();
+            audio.volume = 1;
+        });
+    }, { once: true });
 }
 
 function setupEventHandlers() {
